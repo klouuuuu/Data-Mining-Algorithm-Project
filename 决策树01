@@ -1,0 +1,69 @@
+    #收集数据、输入数据
+def creatDataSet():
+    dataSet=[[1, 1, 'yes'],
+            [1, 1, 'yes'],
+            [1, 0, 'no'],
+            [0, 1, 'no'],
+            [0, 1, 'no']]
+    labels=['no surfacing', 'flippers']
+    return dataSet,labels
+    
+    #计算熵的函数
+def calcShannonEnt(dataSet):
+    #表示数据量
+    length=len(dataSet)
+    #计算不同标签出现次数
+    labelnum={}
+    for line in dataSet:
+        nowlabel=line[-1]
+        if (labelnum[nowlabel] not in labelnum.key()): 
+            labelnum[nowlabel]=0
+        labelnum[nowlabel]+=1
+    #求出香农熵
+    ShannonEnt=0.0
+    for key in labelnum:
+        prob=float(labelnum[key]/length)
+        ShannonEnt-=prob*log(prob,2)
+    return ShannonEnt
+    
+    #根据给定特征划分数据集
+def splitDataSet(dataSet,index,value):
+    """
+    参数：原数据集，给定特征，给定特征的值（eg.yes）
+    返回值：index列为value的数据集【该数据集需要排除index列】
+    """
+    retDataSet=[]
+    for line in DataSet:
+        if line[index]==value:
+            reducedline=line[:index]
+            reducedline.extend(line[index+1:])
+            retDataSet.append(reducedline)
+    return retDataSet
+    
+    #选择最好的数据集划分方式
+def bestSplit(dataSet):
+    """选择最好的特征,和最好的特征的最好的值
+
+    参数：dataSet 数据集
+    返回值：bestFeature 最优的特征列
+    """
+    numFeature=len(dataSet[0])-1
+    baseEntropy=calcShannonEnt(dataSet)
+    bestinfoGain,bestFeature=0.0,-1
+    
+    for i in range(numFeature):
+        fealist=[fea[i] for fea in dataSet]
+        uniquelist=set(fealist)
+        newEntropy=0.0
+        for value in uniquelist:
+            subDataSet=splitDataSet(dataSet,i,value)
+            prob=len(subDataSet)/float(len(dataSet))
+            newEntropy+=prob*calcShannonEnt(subDataSet)#求和
+        infoGain=baseEntropy-newEntropy
+        print('信息增益为',infoGain,'特征为',i,baseEntropy,newEntropy)
+        if(infoGain>bestinfoGain):
+            bestinfoGain=infoGain
+            bestFeature=i
+        return bestFeature
+        
+        
