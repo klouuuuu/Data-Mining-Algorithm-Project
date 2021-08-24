@@ -1,0 +1,103 @@
+#Dating webside project
+
+"""
+      准备数据
+      将数据调整成合适的格式
+"""
+
+def filematrix(filename):
+    """
+      参数：数据文件路径
+      返回值：数据矩阵、对应类别
+    """
+    fr=open(filename)
+    linenumber=len(fr.readlines())
+    
+    returnMat=zeros((linenumber,3))
+    classLabelVector=[]
+    
+    fr=open(filename)
+    index=0
+    for line in fr.readlines():
+        line=line.strip()
+        linelist=line.split('\t')
+        returnMat[index,:]=linelist[0:3]
+        classLabelVector.append(linelist[-1])
+        index+=1
+    return returnMat,classLabelVector
+    
+"""
+      可视化数据-matplotlib二维散点图
+"""
+
+import matplotlib
+import matplotlib.pyplot as plt
+fig=plt.figure()
+ax=fig.add_subplot(111)
+ax.scatter(returnMat[:,0],returnMat[:,1],15.0*array(classLabelVector),15.0*array(classLabelVector))
+plt.show()
+
+"""
+      归一化数据-数据标准化
+"""
+def autoNorm(returnMat):
+    """
+    选取的归一化公式：
+    Y=(X-xmin)/(xmax-xmin)
+    """
+    min=returnMat.min(0)
+    max=returnMat.max(0)
+    ranges=max-min
+    normDataSet=zeros(shape(returnMat))
+    numberOfLine=returnMat.shape[0]
+    normDataSet=returnMat-tile(min,(numberOfLine,1))
+    normDataSet=normDataSet/tile(ranges,(numberOfLine,1))
+    return normDataSet,ranges,min
+    
+"""
+   knn算法-分类
+"""
+def knnClassify(score,normDataSet,classLabelVector,k):
+    """
+    距离公式为欧氏距离
+    """
+    length=normDataSet.shape[0]
+    difmat=tile(score,(length,1))-normDataSet
+    sqdifmat=difmat**2
+    summat=sqdifmat.sum(axis=1)
+    distance=summat**0.5
+    
+    sortedDistance=distance.argsort()
+    classCountNumber={}
+    for i in range(k):
+        votedLabel=classLabelVector(sortedDistance[i])
+        classCountNumber[votedLabel]=classCountNumber.(getvotedLabel,0)+1
+    sortedvotedLabel=sorted(classCountNumber.iteritems(),key=operator.itemgetter(1),reverse=True)
+    return sortedvotedLabel[0][0]
+    
+ 
+ """
+knn01算法代码测试
+"""
+
+def datingClassTest():
+    """
+    返回值：错误率
+    """
+    #测试数据比例
+    hoRatio=0.1
+    
+    mat,label=filematrix('filelink')
+    dataSet,ranges,min=autoNorm(mat)
+    m=dataSet.shape[0]
+    num=int(m*hoRatio)
+    print('numTest=',num)
+    
+    errorCount=0.0
+    for i in range(num):
+        classifierResult=knnClassify(dataSet[i,:],dataSet[num:m,:],label[num:m,:],3)
+        print('该分类器返回：%d,实际分类为%d'%(classfierResult,label[i]))
+        if(classfierResult!=label[i]): errorCount+=1.0
+    print('该分类器的错误路为：%f'%(errorCount/float(num)))
+    print(errorCount)
+ 
