@@ -1,15 +1,22 @@
-#Dating webside project
+#约会网站项目
 
 """
-      准备数据
-      将数据调整成合适的格式
+对于每一个在数据集中的数据点: 
+计算目标的数据点（需要分类的数据点）与该数据点的距离
+将距离排序: 从小到大
+选取前K个最短距离
+选取这K个中最多的分类类别
+返回该类别来作为目标数据点的预测值
 """
 
-def filematrix(filename):
-    """
+
+
+#准备数据-将数据调整成合适的格式
+ """
       参数：数据文件路径
       返回值：数据矩阵、对应类别
-    """
+ """
+def filematrix(filename):
     fr=open(filename)
     linenumber=len(fr.readlines())
     
@@ -24,45 +31,51 @@ def filematrix(filename):
         returnMat[index,:]=linelist[0:3]
         classLabelVector.append(linelist[-1])
         index+=1
+        
     return returnMat,classLabelVector
     
-"""
-      可视化数据-matplotlib二维散点图
-"""
-
+    
+    
+#可视化数据-matplotlib二维散点图
 import matplotlib
 import matplotlib.pyplot as plt
+
 fig=plt.figure()
 ax=fig.add_subplot(111)
+
 ax.scatter(returnMat[:,0],returnMat[:,1],15.0*array(classLabelVector),15.0*array(classLabelVector))
+
 plt.show()
 
+
+
+#归一化数据-数据标准化
 """
-      归一化数据-数据标准化
-"""
-def autoNorm(returnMat):
-    """
     选取的归一化公式：
     Y=(X-xmin)/(xmax-xmin)
-    """
+"""
+def autoNorm(returnMat): 
     min=returnMat.min(0)
     max=returnMat.max(0)
     ranges=max-min
+    
     normDataSet=zeros(shape(returnMat))
+    
     numberOfLine=returnMat.shape[0]
     normDataSet=returnMat-tile(min,(numberOfLine,1))
     normDataSet=normDataSet/tile(ranges,(numberOfLine,1))
+    
     return normDataSet,ranges,min
     
+    
+    
+    difmat=tile(score,(length,1))-normDataSet
+#knn算法-分类
 """
-   knn算法-分类
+    距离公式为欧氏距离
 """
 def knnClassify(score,normDataSet,classLabelVector,k):
-    """
-    距离公式为欧氏距离
-    """
     length=normDataSet.shape[0]
-    difmat=tile(score,(length,1))-normDataSet
     sqdifmat=difmat**2
     summat=sqdifmat.sum(axis=1)
     distance=summat**0.5
@@ -70,20 +83,18 @@ def knnClassify(score,normDataSet,classLabelVector,k):
     sortedDistance=distance.argsort()
     classCountNumber={}
     for i in range(k):
-        votedLabel=classLabelVector(sortedDistance[i])
+        votedLabel=classLabelVector[sortedDistance[i]]
         classCountNumber[votedLabel]=classCountNumber.(getvotedLabel,0)+1
     sortedvotedLabel=sorted(classCountNumber.iteritems(),key=operator.itemgetter(1),reverse=True)
     return sortedvotedLabel[0][0]
     
  
- """
-knn01算法代码测试
+ 
+#knn01算法代码测试
 """
-
-def datingClassTest():
-    """
     返回值：错误率
-    """
+"""
+def datingClassTest():
     #测试数据比例
     hoRatio=0.1
     
@@ -101,3 +112,19 @@ def datingClassTest():
     print('该分类器的错误路为：%f'%(errorCount/float(num)))
     print(errorCount)
  
+
+
+#约会网站预测总函数
+def classifyPerson():
+    resultList = ['not at all', 'in small doses', 'in large doses']
+    percentTats = float(raw_input("percentage of time spent playing video games ?"))
+    ffMiles = float(raw_input("frequent filer miles earned per year?"))
+    iceCream = float(raw_input("liters of ice cream consumed per year?"))
+    datingDataMat, datingLabels = filematrix('datingTestSet2.txt')
+    normMat, ranges, minVals = autoNorm(datingDataMat)
+    inArr = array([ffMiles, percentTats, iceCream])
+    classifierResult = knnClassify((inArr-minVals)/ranges,normMat,datingLabels, 3)
+    print( "You will probably like this person: ", resultList[classifierResult - 1])
+    
+    
+#main(): classifyPerson()
