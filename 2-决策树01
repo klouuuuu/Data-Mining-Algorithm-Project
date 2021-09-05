@@ -1,4 +1,21 @@
-    #收集数据、输入数据
+#判定属于鱼类还是鱼类项目
+'''
+构造一个决策树:使用 createBranch() 方法，如下所示:
+def createBranch():
+    检测数据集中的所有数据的分类标签是否相同:
+        If so return 类标签
+        Else:
+            寻找划分数据集的最好特征（划分之后信息熵最小，也就是信息增益最大的特征）
+            划分数据集
+            创建分支节点
+                for 每个划分的子集
+                    调用函数 createBranch （创建分支的函数）并增加返回结果到分支节点中
+            return 分支节点
+'''   
+
+
+
+#收集数据、输入数据
 def creatDataSet():
     dataSet=[[1, 1, 'yes'],
             [1, 1, 'yes'],
@@ -8,7 +25,8 @@ def creatDataSet():
     labels=['no surfacing', 'flippers']
     return dataSet,labels
     
-    #计算熵的函数
+   
+#计算熵的函数
 def calcShannonEnt(dataSet):
     #表示数据量
     length=len(dataSet)
@@ -26,7 +44,8 @@ def calcShannonEnt(dataSet):
         ShannonEnt-=prob*log(prob,2)
     return ShannonEnt
     
-    #根据给定特征划分数据集
+
+#根据给定特征划分数据集
 def splitDataSet(dataSet,index,value):
     """
     参数：原数据集，给定特征，给定特征的值（eg.yes）
@@ -40,7 +59,7 @@ def splitDataSet(dataSet,index,value):
             retDataSet.append(reducedline)
     return retDataSet
     
-    #选择最好的数据集划分方式
+#选择最好的数据集划分方式
 def bestSplit(dataSet):
     """选择最好的特征,和最好的特征的最好的值
 
