@@ -84,5 +84,32 @@ def bestSplit(dataSet):
             bestinfoGain=infoGain
             bestFeature=i
         return bestFeature
-        
+
+
+#构造树的数据结构的训练算法-用字典构成树的数据结构
+def createTree(dataSet,labels):
+    classList=[line[-1] for line in dataSet]
+    if len(classList)==classList.count(classList[0]):
+        return classList[0]
+    
+    if len(dataSet)==1:
+        return max(classList,key=classList.count)
+    
+    bestFeat=bestSplit(dataSet)
+    featList=[example[bestFeat] for example in dataSet]
+    featureList=set(featList)
+    
+    bestFeature=label[bestFeat]
+    myTree={bestFeature:{}}
+    
+    del(labels[bestFeat])
+    for value in featureList :
+        sublabels=labels[:]
+        myTree[bestFeature][value]=createTree(splitDataSet(dataSet,bestFeat,value),sublabels)
+    return myTree
+
+
+
+
+
         
